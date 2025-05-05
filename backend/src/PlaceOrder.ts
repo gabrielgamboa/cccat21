@@ -1,13 +1,16 @@
+import { WebSocket } from "ws";
 import AccountDAO from "./AccountDAO";
 import OrderDAO from "./OrderDAO";
 import crypto from "crypto";
+import { WebSocketClient } from "./WebSocket";
 
 export class PlaceOrder {
   private validSides = ["buy", "sell"];
 
   constructor(
     private readonly orderDAO: OrderDAO,
-    private readonly accountDAO: AccountDAO
+    private readonly accountDAO: AccountDAO,
+    private readonly webSocketClient: WebSocketClient
   ) {}
 
   async execute(input: any) {
@@ -79,6 +82,8 @@ export class PlaceOrder {
 
     // Salvar a ordem no mecanismo de persistência
     await this.orderDAO.createOrder(order);
+
+    await this.webSocketClient.sendMessage(JSON.stringify(order));
 
     // Retornar o ID da ordem criada
     return order.orderId;

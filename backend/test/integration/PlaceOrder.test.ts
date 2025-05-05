@@ -3,15 +3,18 @@ import sinon from "sinon";
 import { randomUUID } from "crypto";
 import { PlaceOrder } from "../../src/PlaceOrder";
 import { OrderDAOMemory } from "../in-memory-dao/order-dao-memory";
+import { WebSocketClient } from "../../src/WebSocket";
 
 let placeOrder: PlaceOrder;
 let accountDAO: AccountDAOMemory;
 let orderDAO: OrderDAOMemory;
+let websocketClient: WebSocketClient;
 
 beforeEach(() => {
   accountDAO = new AccountDAOMemory();
   orderDAO = new OrderDAOMemory();
-  placeOrder = new PlaceOrder(orderDAO, accountDAO);
+  websocketClient = new WebSocketClient();
+  placeOrder = new PlaceOrder(orderDAO, accountDAO, websocketClient);
 });
 
 afterEach(() => {
