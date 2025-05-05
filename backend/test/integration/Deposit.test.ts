@@ -12,7 +12,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  sinon.restore(); 
+  sinon.restore();
+});
 
 test("Deve realizar um depósito", async () => {
   const accountId = randomUUID();
