@@ -5,6 +5,7 @@ export default interface AccountDAO {
   getAccountById(accountId: string): Promise<any>;
   saveAccountAsset(input: any): Promise<void>;
   getAccountAssets(accountId: string): Promise<any>;
+  getAccountAssetBalance(accountId: string, assetId: string): Promise<any>;
 }
 
 export class AccountDAODatabase implements AccountDAO {
@@ -51,10 +52,24 @@ export class AccountDAODatabase implements AccountDAO {
     await connection.$pool.end();
     return accountAssetsData;
   }
+
+  async getAccountAssetBalance(
+    accountId: string,
+    assetId: string
+  ): Promise<any> {
+    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
+    const [accountAssetData] = await connection.query(
+      "select * from ccca.account_asset where account_id = $1 and asset_id = $2",
+      [accountId, assetId]
+    );
+    await connection.$pool.end();
+    return accountAssetData;
+  }
 }
 
 export class AccountDAOMemory implements AccountDAO {
   accounts: any = [];
+  assets: any = [];
 
   async saveAccount(account: any): Promise<void> {
     this.accounts.push(account);
@@ -68,10 +83,19 @@ export class AccountDAOMemory implements AccountDAO {
   }
 
   async saveAccountAsset(input: any): Promise<void> {
-    return Promise.resolve();
+    this.assets.push(input);
   }
 
   async getAccountAssets(accountId: string): Promise<any> {
-    return [];
+    return this.assets.filter((asset: any) => asset.accountId === accountId);
+  }
+
+  async getAccountAssetBalance(
+    accountId: string,
+    assetId: string
+  ): Promise<any> {
+    return this.assets.find(
+      (asset: any) => asset.accountId === accountId && asset.assetId === assetId
+    );
   }
 }
