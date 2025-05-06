@@ -2,7 +2,7 @@ import pgp from "pg-promise";
 
 export default interface OrderDAO {
   getOrdersByAccountId(accountId: any): any;
-  getOrderById(orderId: any): any;
+  getOrderById(orderId: string): any;
   createOrder(order: any): any;
   getOrdersByMarketId(marketId: string): any;
   getOpenOrdersByAccountAndAsset(
@@ -15,8 +15,24 @@ export class OrderDAODatabase implements OrderDAO {
   getOrdersByAccountId(accountId: any) {
     throw new Error("Method not implemented.");
   }
-  getOrderById(orderId: any) {
-    throw new Error("Method not implemented.");
+
+  async getOrderById(orderId: string) {
+    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
+    const [order] = await connection.query(
+      "select * from ccca.order where order_id = $1",
+      [orderId]
+    );
+
+    return {
+      orderId: order.order_id,
+      accountId: order.account_id,
+      marketId: order.market_id,
+      side: order.side,
+      quantity: order.quantity,
+      price: order.price,
+      status: order.status,
+      timestamp: order.timestamp,
+    };
   }
   async createOrder(order: any) {
     const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
