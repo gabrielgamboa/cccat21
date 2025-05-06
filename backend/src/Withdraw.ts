@@ -23,8 +23,6 @@ export class Withdraw {
     if (quantityUpdated < 0) throw new Error("Insufficient funds");
 
     input.quantity = quantityUpdated;
-    console.log({ input });
-
     await this.accountDAO.saveAccountAsset(input);
   }
 }

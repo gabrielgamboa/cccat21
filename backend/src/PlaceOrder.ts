@@ -2,7 +2,7 @@ import { WebSocket } from "ws";
 import AccountDAO from "./AccountDAO";
 import OrderDAO from "./OrderDAO";
 import crypto from "crypto";
-import { WebSocketClient } from "./WebSocket";
+import WebSocketClientInterface, { WebSocketClient } from "./WebSocket";
 
 export class PlaceOrder {
   private validSides = ["buy", "sell"];
@@ -10,7 +10,7 @@ export class PlaceOrder {
   constructor(
     private readonly orderDAO: OrderDAO,
     private readonly accountDAO: AccountDAO,
-    private readonly webSocketClient: WebSocketClient
+    private readonly webSocketClient: WebSocketClientInterface
   ) {}
 
   async execute(input: any) {

@@ -4,16 +4,17 @@ import { randomUUID } from "crypto";
 import { PlaceOrder } from "../../src/PlaceOrder";
 import { OrderDAOMemory } from "../in-memory-dao/order-dao-memory";
 import { WebSocketClient } from "../../src/WebSocket";
+import { FakeWebsocketAdapter } from "../Fake/fake-websocket-adapter";
 
 let placeOrder: PlaceOrder;
 let accountDAO: AccountDAOMemory;
 let orderDAO: OrderDAOMemory;
-let websocketClient: WebSocketClient;
+let websocketClient: FakeWebsocketAdapter;
 
 beforeEach(() => {
   accountDAO = new AccountDAOMemory();
   orderDAO = new OrderDAOMemory();
-  websocketClient = new WebSocketClient();
+  websocketClient = new FakeWebsocketAdapter();
   placeOrder = new PlaceOrder(orderDAO, accountDAO, websocketClient);
 });
 
