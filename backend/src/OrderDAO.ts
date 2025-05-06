@@ -35,8 +35,23 @@ export class OrderDAODatabase implements OrderDAO {
     );
     await connection.$pool.end();
   }
-  getOrdersByMarketId(marketId: string) {
-    throw new Error("Method not implemented.");
+  async getOrdersByMarketId(marketId: string) {
+    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
+    const orders = await connection.query(
+      "select * from ccca.order where market_id = $1",
+      [marketId]
+    );
+    await connection.$pool.end();
+    return orders.map((order: any) => ({
+      orderId: order.order_id,
+      accountId: order.account_id,
+      marketId: order.market_id,
+      side: order.side,
+      quantity: order.quantity,
+      price: order.price,
+      status: order.status,
+      timestamp: order.timestamp,
+    }));
   }
   async getOpenOrdersByAccountAndAsset(
     accountId: string,
