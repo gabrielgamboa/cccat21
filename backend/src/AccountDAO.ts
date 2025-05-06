@@ -1,4 +1,4 @@
-import pgp from "pg-promise";
+import { query } from "./db";
 
 export default interface AccountDAO {
   saveAccount(account: any): Promise<void>;
@@ -10,8 +10,7 @@ export default interface AccountDAO {
 
 export class AccountDAODatabase implements AccountDAO {
   async saveAccount(account: any): Promise<void> {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    await connection.query(
+    await query(
       "insert into ccca.account (account_id, name, email, document, password) values ($1, $2, $3, $4, $5)",
       [
         account.accountId,
@@ -21,35 +20,28 @@ export class AccountDAODatabase implements AccountDAO {
         account.password,
       ]
     );
-    await connection.$pool.end();
   }
 
   async getAccountById(accountId: string): Promise<any> {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    const [accountData] = await connection.query(
+    const [accountData] = await query(
       "select * from ccca.account where account_id = $1",
       [accountId]
     );
-    await connection.$pool.end();
     return accountData;
   }
 
   async saveAccountAsset(input: any): Promise<void> {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    await connection.query(
+    await query(
       "insert into ccca.account_asset (account_id, asset_id, quantity) values ($1, $2, $3)",
       [input.accountId, input.assetId, input.quantity]
     );
-    await connection.$pool.end();
   }
 
   async getAccountAssets(accountId: string): Promise<any> {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    const accountAssetsData = await connection.query(
+    const accountAssetsData = await query(
       "select * from ccca.account_asset where account_id = $1",
       [accountId]
     );
-    await connection.$pool.end();
     return accountAssetsData;
   }
 
@@ -57,12 +49,10 @@ export class AccountDAODatabase implements AccountDAO {
     accountId: string,
     assetId: string
   ): Promise<any> {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    const [accountAssetData] = await connection.query(
+    const [accountAssetData] = await query(
       "select * from ccca.account_asset where account_id = $1 and asset_id = $2",
       [accountId, assetId]
     );
-    await connection.$pool.end();
     return accountAssetData;
   }
 }

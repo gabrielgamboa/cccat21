@@ -1,4 +1,4 @@
-import pgp from "pg-promise";
+import { query } from "./db";
 
 export default interface OrderDAO {
   getOrdersByAccountId(accountId: any): any;
@@ -17,8 +17,7 @@ export class OrderDAODatabase implements OrderDAO {
   }
 
   async getOrderById(orderId: string) {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    const [order] = await connection.query(
+    const [order] = await query(
       "select * from ccca.order where order_id = $1",
       [orderId]
     );
@@ -35,8 +34,7 @@ export class OrderDAODatabase implements OrderDAO {
     };
   }
   async createOrder(order: any) {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    await connection.query(
+    await query(
       "insert into ccca.order (order_id, market_id, account_id, side, quantity, price, status, timestamp) values ($1, $2, $3, $4, $5, $6, $7, $8)",
       [
         order.orderId,
@@ -49,15 +47,12 @@ export class OrderDAODatabase implements OrderDAO {
         order.timestamp,
       ]
     );
-    await connection.$pool.end();
   }
   async getOrdersByMarketId(marketId: string) {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    const orders = await connection.query(
+    const orders = await query(
       "select * from ccca.order where market_id = $1",
       [marketId]
     );
-    await connection.$pool.end();
     return orders.map((order: any) => ({
       orderId: order.order_id,
       accountId: order.account_id,
@@ -73,12 +68,10 @@ export class OrderDAODatabase implements OrderDAO {
     accountId: string,
     assetId: string
   ): Promise<any> {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    const openOrders = await connection.query(
+    const openOrders = await query(
       "select * from ccca.order where account_id = $1 and asset_id = $2 and status = 'open'",
       [accountId, assetId]
     );
-    await connection.$pool.end();
     return openOrders;
   }
 }
